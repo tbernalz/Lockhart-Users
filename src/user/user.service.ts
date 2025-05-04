@@ -26,4 +26,17 @@ export class UserService {
 
     return savedUser;
   }
+
+  async emailExists(email: string): Promise<boolean> {
+    try {
+      const existingUser = await this.findByEmail(email);
+      return !!existingUser;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  async findByEmail(email: CreateUserDto['email']): Promise<User | null> {
+    return await this.userRepo.findOne({ where: { email } });
+  }
 }
