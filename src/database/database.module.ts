@@ -33,7 +33,7 @@ import config from '../config/config';
             envConfig.database.ssl === 'true'
               ? { rejectUnauthorized: false }
               : false,
-          entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+          entities: [__dirname + 'src/**/*.entity{.ts,.js}'],
           synchronize: false,
           autoLoadEntities: true,
           namingStrategy: new SnakeNamingStrategy(),
