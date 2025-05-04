@@ -15,4 +15,19 @@ export class UserController {
       message: emailExists ? 'Email already in use' : 'Email available',
     };
   }
+
+  @Get('check-document-number')
+  async checkDocumentNumber(
+    @Query() documentNumber: CreateUserDto['documentNumber'],
+  ) {
+    const documentNumberExists =
+      await this.userService.documentNumberExists(documentNumber);
+
+    return {
+      documentNumberExists,
+      message: documentNumberExists
+        ? 'Document number already in use'
+        : 'Document number available',
+    };
+  }
 }
