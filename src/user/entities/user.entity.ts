@@ -20,7 +20,7 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'varchar', length: 255, unique: true })
+  @Column({ type: 'varchar', length: 255 })
   @IsNotEmpty()
   @IsString()
   name: string;
@@ -29,7 +29,7 @@ export class User {
   @IsEnum(DocumentType)
   documentType: DocumentType;
 
-  @Column({ type: 'varchar', length: 10 })
+  @Column({ type: 'varchar', length: 10, unique: true })
   @IsNotEmpty()
   @IsString()
   documentNumber: string;
@@ -47,7 +47,11 @@ export class User {
   @IsEmail()
   readonly email: string;
 
-  @Column({ type: 'enum', enum: UserType })
+  @Column({ type: 'varchar', length: 255 })
+  @IsNotEmpty()
+  address: string;
+
+  @Column({ type: 'enum', enum: UserType, default: UserType.CITIZEN })
   @IsEnum(UserType)
   type: UserType;
 

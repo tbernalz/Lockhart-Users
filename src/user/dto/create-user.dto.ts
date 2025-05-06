@@ -32,6 +32,10 @@ export class CreateUserDto {
   @IsEmail()
   email: string;
 
+  @IsString()
+  @IsNotEmpty()
+  address: string;
+
   @IsOptional()
   @IsEnum(UserType)
   type?: UserType;
