@@ -1,29 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
-import { UserEventTypeEnum } from '../enum/event-types.enum';
-import { CreateUserDto } from '../dto/create-user.dto';
+import { UserRequestEventDto } from '../dto/user-request-event.dto';
 
 @Injectable()
-export class UserPublisher {
-  private readonly exchangeName = 'user_exchange';
-  private readonly routingKeyPrefix = 'user';
-
+export class UserPublisherService {
   constructor(private readonly amqpConnection: AmqpConnection) {}
 
   async publishUserEvent(
-    eventType: UserEventTypeEnum,
-    createUserDto: CreateUserDto,
+    exchangeName: string,
+    routingKey: string,
+    message: UserRequestEventDto,
   ): Promise<void> {
-    await this.amqpConnection.publish(
-      this.exchangeName,
-      `${this.routingKeyPrefix}.${eventType.toLowerCase()}`,
-      {
-        payload: createUserDto,
-        headers: {
-          eventType,
-          timestamp: new Date().toISOString(),
-        },
-      },
+    await this.amqpConnection.publish(exchangeName, routingKey, message);
+    console.log(
+      `Published message ${JSON.stringify(message)}. Sent to exchange ${exchangeName} and routingKey: ${routingKey}`,
     );
   }
 }
