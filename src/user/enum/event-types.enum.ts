@@ -1,3 +1,5 @@
 export enum UserEventTypeEnum {
-  CREATED = 'CREATED',
+  CREATE = 'CREATE',
+  UNREGISTER = 'UNREGISTER',
+  VERIFY = 'VERIFY',
 }

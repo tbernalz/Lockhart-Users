@@ -3,7 +3,7 @@ import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
 import { UserRequestEventDto } from '../dto/user-request-event.dto';
 
 @Injectable()
-export class UserPublisherService {
+export class UserPublisher {
   constructor(private readonly amqpConnection: AmqpConnection) {}
 
   async publishUserEvent(

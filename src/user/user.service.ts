@@ -2,13 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
+import { RABBITMQ_CONFIG } from 'src/config/rabbitmq.constants';
 import { UserPublisher } from './publishers/user.publisher';
 import { User } from './entities/user.entity';
 import { UserEventTypeEnum } from './enum/event-types.enum';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UserRequestEventDto } from './dto/user-request-event.dto';
 
 @Injectable()
 export class UserService {
+  private static readonly userCreateQueue = RABBITMQ_CONFIG;
   constructor(
     private readonly userPublisher: UserPublisher,
 
@@ -16,15 +19,27 @@ export class UserService {
     private readonly userRepo: Repository<User>,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<CreateUserDto> {
-    const savedUser = this.userRepo.create(createUserDto);
+  async verify(createUserDto: CreateUserDto): Promise<CreateUserDto> {
+    const newUser = this.userRepo.create(createUserDto);
+    await this.userRepo.save(newUser);
+
+    const message: UserRequestEventDto = {
+      eventId: '',
+      payload: createUserDto,
+      headers: {
+        userId: createUserDto.documentNumber,
+        eventType: UserEventTypeEnum.VERIFY,
+        timestamp: new Date().toISOString(),
+      },
+    };
 
     await this.userPublisher.publishUserEvent(
-      UserEventTypeEnum.CREATED,
-      createUserDto,
+      UserService.userCreateQueue.exchanges.publisher.user,
+      UserService.userCreateQueue.routingKeys.userRequest,
+      message,
     );
 
-    return savedUser;
+    return newUser;
   }
 
   async emailExists(email: CreateUserDto['email']): Promise<boolean> {
