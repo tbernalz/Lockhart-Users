@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -11,6 +11,7 @@ import { UserRequestEventDto } from './dto/user-request-event.dto';
 
 @Injectable()
 export class UserService {
+  private readonly logger = new Logger(UserService.name);
   private static readonly rabbitmqConfig = RABBITMQ_CONFIG;
   constructor(
     private readonly userPublisher: UserPublisher,
@@ -74,5 +75,23 @@ export class UserService {
     return await this.userRepo.findOne({
       where: { documentNumber: documentNumber },
     });
+  }
+
+  async handleUserEvents(
+    userId: UserRequestEventDto['headers']['userId'],
+    operation: UserRequestEventDto['headers']['eventType'],
+    message: UserRequestEventDto['payload'],
+  ): Promise<void> {
+    try {
+      switch (operation) {
+        default:
+          throw new Error(`Unsupported operation: ${operation}`);
+      }
+    } catch (error) {
+      this.logger.error(
+        `Message processing in handleUserRequest failed: ${error.message}`,
+        error.stack,
+      );
+    }
   }
 }
