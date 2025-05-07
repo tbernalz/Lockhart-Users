@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -45,6 +45,12 @@ export class UserService {
     return newUser;
   }
 
+  async activateFull(user: User): Promise<User> {
+    user.Active = true;
+    user.GovCarpetaVerified = true;
+    return await this.userRepo.save(user);
+  }
+
   async emailExists(email: CreateUserDto['email']): Promise<boolean> {
     try {
       const existingUser = await this.findByEmail(email);
@@ -84,6 +90,10 @@ export class UserService {
   ): Promise<void> {
     try {
       switch (operation) {
+        case UserEventTypeEnum.CREATE:
+          await this.processUserActivation(message as CreateUserDto['email']);
+          break;
+
         default:
           throw new Error(`Unsupported operation: ${operation}`);
       }
@@ -92,6 +102,35 @@ export class UserService {
         `Message processing in handleUserRequest failed: ${error.message}`,
         error.stack,
       );
+    }
+  }
+
+  async processUserActivation(email: CreateUserDto['email']): Promise<void> {
+    try {
+      const user = await this.findByEmail(email);
+      if (!user) {
+        throw new NotFoundException(`User with email ${email} not found`);
+      }
+      await this.activateFull(user);
+
+      const message: UserRequestEventDto['payload'] = {
+        documentNumber: user.documentNumber,
+      };
+
+      const headers: UserRequestEventDto['headers'] = {
+        userId: '',
+        eventType: UserEventTypeEnum.CREATE,
+        timestamp: new Date().toISOString(),
+      };
+
+      await this.userPublisher.publishUserEvent(
+        UserService.rabbitmqConfig.exchanges.publisher.document,
+        UserService.rabbitmqConfig.routingKeys.documentRequest,
+        message,
+        headers,
+      );
+    } catch (error) {
+      this.logger.error(`User activation failed`, error.stack);
     }
   }
 }
