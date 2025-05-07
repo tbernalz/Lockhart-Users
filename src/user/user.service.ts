@@ -11,7 +11,7 @@ import { UserRequestEventDto } from './dto/user-request-event.dto';
 
 @Injectable()
 export class UserService {
-  private static readonly userCreateQueue = RABBITMQ_CONFIG;
+  private static readonly rabbitmqConfig = RABBITMQ_CONFIG;
   constructor(
     private readonly userPublisher: UserPublisher,
 
@@ -25,7 +25,7 @@ export class UserService {
 
     const message: UserRequestEventDto = {
       eventId: '',
-      payload: createUserDto,
+      payload: { id: newUser.id, ...createUserDto },
       headers: {
         userId: createUserDto.documentNumber,
         eventType: UserEventTypeEnum.VERIFY,
@@ -34,8 +34,8 @@ export class UserService {
     };
 
     await this.userPublisher.publishUserEvent(
-      UserService.userCreateQueue.exchanges.publisher.user,
-      UserService.userCreateQueue.routingKeys.userRequest,
+      UserService.rabbitmqConfig.exchanges.publisher.user,
+      UserService.rabbitmqConfig.routingKeys.userRequest,
       message,
     );
 
