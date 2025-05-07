@@ -9,11 +9,15 @@ export class UserPublisher {
   async publishUserEvent(
     exchangeName: string,
     routingKey: string,
-    message: UserRequestEventDto,
+    message: UserRequestEventDto['payload'],
+    headers: UserRequestEventDto['headers'],
   ): Promise<void> {
-    await this.amqpConnection.publish(exchangeName, routingKey, message);
+    await this.amqpConnection.publish(exchangeName, routingKey, message, {
+      headers,
+    });
+
     console.log(
-      `Published message ${JSON.stringify(message)}. Sent to exchange ${exchangeName} and routingKey: ${routingKey}`,
+      `Published message: ${JSON.stringify(message)}. Headers: ${JSON.stringify(headers)} Sent to exchange: ${exchangeName} and routingKey: ${routingKey}`,
     );
   }
 }

@@ -23,20 +23,22 @@ export class UserService {
     const newUser = this.userRepo.create(createUserDto);
     await this.userRepo.save(newUser);
 
-    const message: UserRequestEventDto = {
-      eventId: '',
-      payload: { id: newUser.id, ...createUserDto },
-      headers: {
-        userId: createUserDto.documentNumber,
-        eventType: UserEventTypeEnum.VERIFY,
-        timestamp: new Date().toISOString(),
-      },
+    const message: UserRequestEventDto['payload'] = {
+      id: newUser.id,
+      ...createUserDto,
+    };
+
+    const headers: UserRequestEventDto['headers'] = {
+      userId: createUserDto.documentNumber,
+      eventType: UserEventTypeEnum.VERIFY,
+      timestamp: new Date().toISOString(),
     };
 
     await this.userPublisher.publishUserEvent(
       UserService.rabbitmqConfig.exchanges.publisher.user,
       UserService.rabbitmqConfig.routingKeys.userRequest,
       message,
+      headers,
     );
 
     return newUser;
