@@ -13,6 +13,9 @@ import { UserRequestEventDto } from './dto/user-request-event.dto';
 export class UserService {
   private readonly logger = new Logger(UserService.name);
   private static readonly rabbitmqConfig = RABBITMQ_CONFIG;
+  private static readonly OPERATOR_NAME = process.env.OPERATOR_NAME;
+  private static readonly OPERATOR_ID = process.env.OPERATOR_ID;
+
   constructor(
     private readonly userPublisher: UserPublisher,
 
@@ -25,8 +28,10 @@ export class UserService {
     await this.userRepo.save(newUser);
 
     const message: UserRequestEventDto['payload'] = {
-      id: newUser.id,
+      id: newUser.documentNumber,
       ...createUserDto,
+      operatorId: UserService.OPERATOR_ID,
+      operatorName: UserService.OPERATOR_NAME,
     };
 
     const headers: UserRequestEventDto['headers'] = {
