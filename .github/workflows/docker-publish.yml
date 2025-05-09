@@ -8,7 +8,7 @@ env:
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
   DEPLOYMENT_NAME: lockhart-users-system
   IMAGE_NAME: lockhart-users
-  DOCKERFILE_LOCATION: lockhart-users-system
+  DOCKERFILE_LOCATION: .
 jobs:
   generate-version:
     runs-on: ubuntu-22.04
@@ -51,4 +51,4 @@ jobs:
           context: .
           file: ./${{ env.DOCKERFILE_LOCATION }}/Dockerfile
           push: true
-          tags: tbernal121/${{ env.IMAGE_NAME }}:latest, xduserxd/${{ env.IMAGE_NAME }}:${{ needs.generate-version.outputs.new_tag }}
+          tags: tbernal121/${{ env.IMAGE_NAME }}:latest, tbernal121/${{ env.IMAGE_NAME }}:${{ needs.generate-version.outputs.new_tag }}
