@@ -19,6 +19,13 @@ async function bootstrap() {
     credentials: false,
   });
 
+  app.use((req, res, next) => {
+    if (req.method === 'OPTIONS') {
+      return res.status(204).end();
+    }
+    next();
+  });
+
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
