@@ -8,7 +8,7 @@ env:
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
   DEPLOYMENT_NAME: lockhart-users-system
   IMAGE_NAME: lockhart-users
-  DOCKERFILE_LOCATION: lockhart-users-system
+  DOCKERFILE_LOCATION: .
 jobs:
   generate-version:
     runs-on: ubuntu-22.04
