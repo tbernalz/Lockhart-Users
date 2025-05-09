@@ -56,10 +56,10 @@ export class User {
   type: UserType;
 
   @Column({ type: 'boolean', default: false })
-  GovCarpetaVerified: boolean;
+  govCarpetaVerified: boolean;
 
   @Column({ type: 'boolean', default: false })
-  Active: boolean;
+  active: boolean;
 
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;

@@ -51,8 +51,8 @@ export class UserService {
   }
 
   async activateFull(user: User): Promise<User> {
-    user.Active = true;
-    user.GovCarpetaVerified = true;
+    user.active = true;
+    user.govCarpetaVerified = true;
     return await this.userRepo.save(user);
   }
 
