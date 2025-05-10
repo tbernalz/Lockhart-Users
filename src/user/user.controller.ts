@@ -1,5 +1,4 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
-import { FirebaseUser } from 'src/guards/user-info.decorator';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 
@@ -13,11 +12,7 @@ export class UserController {
   }
 
   @Get('check-email')
-  async checkEmail(
-    @Query() email: CreateUserDto['email'],
-    @FirebaseUser() user: any,
-  ) {
-    console.log(`user data from firebase: ${user}`);
+  async checkEmail(@Query() email: CreateUserDto['email']) {
     const emailExists = await this.userService.emailExists(email);
 
     return {
