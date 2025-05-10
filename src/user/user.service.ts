@@ -96,7 +96,9 @@ export class UserService {
     try {
       switch (operation) {
         case UserEventTypeEnum.CREATE:
-          await this.processUserActivation(message as CreateUserDto['email']);
+          await this.processUserActivation(
+            message.email as CreateUserDto['email'],
+          );
           break;
 
         default:
